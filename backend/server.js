@@ -40,17 +40,34 @@ let carsMockData = [
     }
 ]
 
-/** Create GET API. API shoudl return  const carsMockData*/
+/** Create GET API. API should return const carsMockData*/
 
-
+app.get("/list", (request, response) => {
+    response.send(carsMockData)
+})
 
 
 
 /** Create POST API. Get the new car data from react. 
  *      Check if car with id exists. If Yes return 500. With message 'Car already exists'
- *      If there is no car with the id, add the new car to  carsMockData and return carsMockData as response */
+ *      If there is no car with the id, add the new car to carsMockData and return carsMockData as response */
 
+ app.post("/save", (request, response) => {
+    let carWithId = carsMockData.some(car => car.id === parseInt(request.body.id))
 
+    if(carWithId){
+        response.status(500).send("Car already exists")
+    }
+    else{
+        let id = parseInt(request.body.id);
+        let brand = request.body.brand;
+        let name = request.body.name;
+        let releaseYear = request.body.releaseYear;
+        let color = request.body.color;
+        carsMockData.push({"id":id, "brand":brand, "name":name, "releaseYear": releaseYear, "color": color});
+        response.send(carsMockData);
+    }
+})
 
 
 
@@ -58,10 +75,38 @@ let carsMockData = [
  *  Check if car with id exists. If No return 500 with error 'No car with given id exist'. 
  *  If there is car with the requested id, update that car's data in 'carsMockData' and return 'carsMockData' */
 
-
+ app.put("/edit", (require, response) => {
+    let CarWithId = carsMockData.some(car => car.id === parseInt(require.body.id))
+    if(CarWithId){
+        let id = parseInt(require.body.id);
+        let brand = require.body.brand;
+        let name = require.body.name;
+        let releaseYear = require.body.releaseYear;
+        let color = require.body.color;
+        carsMockData.push({"id":id, "brand":brand, "name":name, "releaseYear": releaseYear, "color": color});
+        response.send(carsMockData);
+    }
+    else{
+        response.status(500).send('No car with given id exist')
+    }
+})
 
 
 /** Create Delete API. 
- *  Check if car with id exists. If No return 500. With message 'No car with give id exists'
+ *  Check if car with id exists. If No return 500. With message 'No car with given id exists'
  *  If there is car with the requested id. Delete that car from 'carsMockData' and return 'carsMockData'
 */
+
+app.delete("/delete", (request, response) => {
+    let carWithId = carsMockData.some(car => car.id === parseInt(request.body.id))
+
+    if(carWithId){
+        carsMockData = carsMockData.filter((car) => car.id !== request.body.id) 
+        response.send(carsMockData);
+    }
+    else{
+        response.status(500).send('No car with given id exists')
+    }
+})
+
+app.listen(8000);
