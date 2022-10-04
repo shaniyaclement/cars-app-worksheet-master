@@ -12,12 +12,23 @@ function Cars() {
  */
   const carFormInitialData = {
     id: 0,
-    name: ''
+    brand: '',
+    name: '',
+    releaseYear: 0,
+    color: ''
   }
   const [carFormData, setCarFormData] = useState(carFormInitialData);
+  const [carData, setCarData] = useState([]);
+  useEffect(() => {
+    fetch('http://localhost:8000/list')
+    .then(response  => response.json())
+    .then((result) => {
+      setCarData(result);
+    })
+  }, [])
 
   const handleInputChange = (e) => {
-    const { name, value } = e.target;
+    const {name, value} = e.target;
     setCarFormData({
       ...carFormData,
       [name]: value,
@@ -31,14 +42,41 @@ function Cars() {
      * https://googlechrome.github.io/samples/fetch-api/fetch-post.html
      */
     event.preventDefault();
+    fetch("http://localhost:8000/save", {
+      method: "POST",
+      body : JSON.stringify({
+        id: event.target.id.value,
+        brand: event.target.brand.value,
+        name: event.target.name.value,
+        releaseYear: event.target.releaseYear.value,
+        color: event.target.color.value
+      }),
+      headers: {'Content-Type': 'application/json'},
+    }).then(response => response.json()).then((result) => {
+      setCarData(result)
+    })
+
+    setCarFormData(carFormInitialData);
   }
 
-  const handleDelete = () => {
+  const handleDelete = (id) => {
     /**
      * When clicked on a delete button, get the id of the car's delete button clicked
      * Then use javascript fetch to send DELETE request to NodeJS
      * https://openjavascript.info/2022/01/03/using-fetch-to-make-get-post-put-and-delete-requests/
      */
+
+     fetch("http://localhost:8000/delete", {
+      method: "DELETE",
+      body: JSON.stringify({
+        id:id
+      }),
+      headers: {
+        'Content-type': 'application/json'
+      }
+    }).then(response => response.json()).then((result) => {
+      setCarData(result)
+    })
   }
 
 /** 🥳🥳🥳🥳🥳🥳 DOUBLE BONUS POINTS 🥳🥳🥳🥳🥳🥳 */
